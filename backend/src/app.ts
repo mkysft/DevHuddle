@@ -1,7 +1,9 @@
 // Imports
+import "reflect-metadata";
 const express = require("express");
-const logger = require("./middleware/logger");
+const logger = require("./middleware/LoggerMiddleware");
 const database = require("./config/database");
+const routes = require("./routes");
 const app = express();
 
 // Configure Application
@@ -11,19 +13,17 @@ app.set("port", port);
 // Middleware
 app.use(express.json());
 app.use(logger("dev"));
+database();
 
 // Routes
-app.get("/", (req, res) => {
-	res.send("Hello World!");
-});
+app.use("/", routes);
 
-app.post("/", (req, res) => {
-	console.log(req.body);
-	res.send("Hello World!");
+app.get("/", (req, res) => {
+    res.send("Dev Huddle API v1.0");
 });
 
 app.listen(port, () => {
-	console.log(`@@@@ Listening at http://localhost:${port}`);
+    console.log(`@@@@ Listening at http://localhost:${port}`);
 });
 
 module.exports = app;
