@@ -5,10 +5,17 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     Unique,
+    OneToMany,
+    BeforeInsert,
+    BeforeUpdate,
 } from "typeorm";
-import { IsNotEmpty } from "class-validator";
+import { validate, IsNotEmpty } from "class-validator";
 import * as bcrypt from "bcryptjs";
 import * as jwt from "jsonwebtoken";
+
+// Entities
+import { Post } from "./Post";
+import { Comment } from "./Comment";
 
 export enum UserRole {
     ADMIN = "admin",
@@ -59,6 +66,9 @@ export class User {
     })
     experienceLevel: string;
 
+    @Column({ type: "simple-array", default: "HTML,CSS" })
+    techStack: string[];
+
     @Column()
     @CreateDateColumn()
     createdAt: Date;
@@ -67,7 +77,23 @@ export class User {
     @UpdateDateColumn()
     updatedAt: Date;
 
+    // Relations
+    @OneToMany((type) => Post, (post) => post.user)
+    posts: Post[];
+
+    @OneToMany((type) => Comment, (comment) => comment.user)
+    comments: Comment[];
+
     // Methods
+    @BeforeInsert()
+    @BeforeUpdate()
+    async validateUser() {
+        const errors = await validate(this);
+        if (errors.length > 0) {
+            throw new Error(errors.toString());
+        }
+    }
+
     signJsonWebToken() {
         return jwt.sign(
             {

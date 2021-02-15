@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { getRepository } from "typeorm";
-import { validate } from "class-validator";
 import { UserRequest } from "../interfaces/UserRequestInterface";
 import { User } from "../entities/User";
 
@@ -23,6 +22,13 @@ class UserController {
         //Get the ID from the url
         const id: string = req.params.id;
 
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "No User ID provided in parameters.",
+            });
+        }
+
         //Get the user from database
         const userRepository = getRepository(User);
         try {
@@ -41,9 +47,85 @@ class UserController {
         }
     };
 
+    static updateUserByID = async (req: Request, res: Response) => {
+        // Get the ID from the url
+        const id: string = req.params.id;
+
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "No User ID provided in parameters.",
+            });
+        }
+
+        // Fetch and update the user from database
+        const userRepository = getRepository(User);
+        let user;
+        try {
+            user = await userRepository.findOneOrFail(id);
+        } catch (error) {
+            res.status(404).json({
+                success: false,
+                message: `No Users found with ID: ${id}`,
+            });
+        }
+
+        // Get parameters from the request body
+        let { firstName, lastName, emailAddress, experienceLevel, techStack } = req.body;
+
+        // Create a new User
+        user.firstName = firstName;
+        user.lastName = lastName;
+        user.emailAddress = emailAddress;
+        user.experienceLevel = experienceLevel;
+        user.techStack = techStack;
+
+        try {
+            await userRepository.save(user);
+            return res.status(200).json({
+                success: "true",
+                message: "User was successfully updated!",
+                data: user,
+            });
+        } catch (error) {
+            console.log(error.message);
+            res.status(500).json({
+                success: false,
+                message: `Failed to update User. Try again.`,
+            });
+        }
+    };
+
+    static deleteUserByID = async (req: Request, res: Response) => {
+        // Get the ID from the url
+        const id: string = req.params.id;
+
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "No User ID provided in parameters.",
+            });
+        }
+
+        // Fetch and delete the user from database
+        const userRepository = getRepository(User);
+        try {
+            await userRepository.delete(id);
+            return res.status(200).json({
+                success: "true",
+                message: "User account was successfully deleted!",
+            });
+        } catch (error) {
+            res.status(404).json({
+                success: false,
+                message: `No Users found with ID: ${id}`,
+            });
+        }
+    };
+
     static getCurrentUser = async (req: UserRequest, res: Response) => {
         // Get the user ID from the authentication middleware
-        const id: string = req.user.id;
+        const id: string = req?.user?.id;
 
         if (!id) {
             return res.status(400).json({
@@ -70,60 +152,107 @@ class UserController {
         }
     };
 
-    static editUser = async (req: Request, res: Response) => {
-        //Get the ID from the url
-        const id = req.params.id;
+    static updateCurrentUser = async (req: UserRequest, res: Response) => {
+        // Get the user ID from the authentication middleware
+        const id: string = req.user.id;
 
-        //Get values from the body
-        const { username, role } = req.body;
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "No User ID provided in token.",
+            });
+        }
 
-        //Try to find user on database
+        // Fetch and return the user from database
         const userRepository = getRepository(User);
         let user;
         try {
             user = await userRepository.findOneOrFail(id);
         } catch (error) {
-            //If not found, send a 404 response
-            res.status(404).send("User not found");
-            return;
+            res.status(404).json({
+                success: false,
+                message: `No Users found with ID: ${id}`,
+            });
         }
 
-        //Validate the new values on model
-        user.username = username;
-        user.role = role;
-        const errors = await validate(user);
-        if (errors.length > 0) {
-            res.status(400).send(errors);
-            return;
-        }
+        // Get parameters from the request body
+        let { firstName, lastName, emailAddress, experienceLevel, techStack } = req.body;
 
-        //Try to safe, if fails, that means username already in use
+        // Create a new User
+        user.firstName = firstName;
+        user.lastName = lastName;
+        user.emailAddress = emailAddress;
+        user.experienceLevel = experienceLevel;
+        user.techStack = techStack;
+
         try {
             await userRepository.save(user);
-        } catch (e) {
-            res.status(409).send("username already in use");
-            return;
+            return res.status(200).json({
+                success: "true",
+                message: "User was successfully updated!",
+                data: user,
+            });
+        } catch (error) {
+            console.log(error.message);
+            res.status(500).json({
+                success: false,
+                message: `Failed to update User. Try again.`,
+            });
         }
-        //After all send a 204 (no content, but accepted) response
-        res.status(204).send();
     };
 
-    static deleteUser = async (req: Request, res: Response) => {
-        //Get the ID from the url
-        const id = req.params.id;
+    static activateUser = async (req: Request, res: Response) => {
+        // Get the ID from the url
+        const id: string = req.params.id;
 
-        const userRepository = getRepository(User);
-        let user: User;
-        try {
-            user = await userRepository.findOneOrFail(id);
-        } catch (error) {
-            res.status(404).send("User not found");
-            return;
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "No User ID provided in parameters.",
+            });
         }
-        userRepository.delete(id);
 
-        //After all send a 204 (no content, but accepted) response
-        res.status(204).send();
+        // Fetch and return the user from database
+        const userRepository = getRepository(User);
+        try {
+            await userRepository.restore(id);
+            return res.status(200).json({
+                success: "true",
+                message: "User account successfully re-activated.",
+            });
+        } catch (error) {
+            res.status(404).json({
+                success: false,
+                message: `No Users found with ID: ${id}`,
+            });
+        }
+    };
+
+    static deactivateUser = async (req: Request, res: Response) => {
+        // Get the ID from the url
+        const id: string = req.params.id;
+
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "No User ID provided in parameters.",
+            });
+        }
+
+        // Fetch and return the user from database
+        const userRepository = getRepository(User);
+        try {
+            await userRepository.softDelete(id);
+            return res.status(200).json({
+                success: "true",
+                message: "User account de-activated.",
+            });
+        } catch (error) {
+            res.status(404).json({
+                success: false,
+                message: `No Users found with ID: ${id}`,
+            });
+        }
     };
 }
 

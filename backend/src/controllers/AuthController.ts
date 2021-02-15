@@ -35,7 +35,7 @@ class AuthController {
         } catch (error) {
             return res.status(409).json({
                 success: false,
-                message: "Email Address provided already in use.",
+                message: "An account is already associated with this email address.",
             });
         }
 
