@@ -1,13 +1,22 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import { FindManyOptions, getRepository } from "typeorm";
 import { UserRequest } from "../interfaces/UserRequestInterface";
 import { Post } from "../entities/Post";
 
 class PostController {
-    static getAllPosts = async (req: Request, res: Response) => {
+    static getPostFeed = async (req: Request, res: Response) => {
+        const { where, order, page = 1, limit = 10, cache = true }: any = req.params;
+        const query: FindManyOptions<Post> = {
+            where: { ...where },
+            order: { ...order },
+            skip: (page - 1) * limit,
+            take: limit,
+            cache: cache,
+        };
+
         // Get users from database
         const postRepository = getRepository(Post);
-        const posts = await postRepository.find();
+        const [posts, count] = await postRepository.findAndCount(query);
 
         // Do pagination stuff I guess
 
@@ -15,6 +24,35 @@ class PostController {
         res.status(200).json({
             success: true,
             data: posts,
+            pagination: {
+                count: count,
+            },
+        });
+    };
+
+    static getAllPosts = async (req: Request, res: Response) => {
+        const { where, order, page = 1, limit = 10, cache = true }: any = req.params;
+        const query: FindManyOptions<Post> = {
+            where: { ...where },
+            order: { ...order },
+            skip: (page - 1) * limit,
+            take: limit,
+            cache: cache,
+        };
+
+        // Get users from database
+        const postRepository = getRepository(Post);
+        const [posts, count] = await postRepository.findAndCount(query);
+
+        // Do pagination stuff I guess
+
+        // Send the users object
+        res.status(200).json({
+            success: true,
+            data: posts,
+            pagination: {
+                count: count,
+            },
         });
     };
 
@@ -102,19 +140,13 @@ class PostController {
         }
 
         // Update user with parameters from the request body
-        let { title, slug, description, contentMarkdown, tags } = req.body;
-        post.title = title;
-        post.slug = slug;
-        post.description = description;
-        post.contentMarkdown = contentMarkdown;
-        post.tags = tags;
-
         try {
-            await postRepository.save(post);
+            let updatedPost = await postRepository.save({ id, ...post, ...req.body });
+            console.log(updatedPost);
             return res.status(200).json({
                 success: "true",
                 message: "Post was successfully updated!",
-                data: post,
+                data: updatedPost,
             });
         } catch (error) {
             console.log(error);

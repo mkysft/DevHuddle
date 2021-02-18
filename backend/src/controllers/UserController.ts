@@ -1,20 +1,35 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
+import { FindManyOptions, getRepository } from "typeorm";
 import { UserRequest } from "../interfaces/UserRequestInterface";
 import { User } from "../entities/User";
 
+interface QueryParams {
+    select: string[];
+}
 class UserController {
     static getAllUsers = async (req: Request, res: Response) => {
+        const { where, order, page = 1, limit = 10, cache = true }: any = req.params;
+        const query: FindManyOptions<User> = {
+            where: { ...where },
+            order: { ...order },
+            skip: (page - 1) * limit,
+            take: limit,
+            cache: cache,
+        };
+
         // Get users from database
         const userRepository = getRepository(User);
-        const users = await userRepository.find();
+        const [users, count] = await userRepository.findAndCount(query);
 
-        // Do pagination stuff I guess
+        // Pagination Calculations continued
 
         // Send the users object
         res.status(200).json({
             success: true,
             data: users,
+            pagination: {
+                total: count,
+            },
         });
     };
 
@@ -70,22 +85,12 @@ class UserController {
             });
         }
 
-        // Get parameters from the request body
-        let { firstName, lastName, emailAddress, experienceLevel, techStack } = req.body;
-
-        // Create a new User
-        user.firstName = firstName;
-        user.lastName = lastName;
-        user.emailAddress = emailAddress;
-        user.experienceLevel = experienceLevel;
-        user.techStack = techStack;
-
         try {
-            await userRepository.save(user);
+            let updatedUser = await userRepository.save({ id, ...user, ...req.body });
             return res.status(200).json({
                 success: "true",
                 message: "User was successfully updated!",
-                data: user,
+                data: updatedUser,
             });
         } catch (error) {
             console.log(error.message);
