@@ -34,7 +34,7 @@ class UserController {
     };
 
     static getUserByID = async (req: Request, res: Response) => {
-        //Get the ID from the url
+        // Get the ID from the url
         const id: string = req.params.id;
 
         if (!id) {
@@ -44,7 +44,7 @@ class UserController {
             });
         }
 
-        //Get the user from database
+        // Get the user from database
         const userRepository = getRepository(User);
         try {
             const user = await userRepository.findOneOrFail(id);
@@ -93,7 +93,6 @@ class UserController {
                 data: updatedUser,
             });
         } catch (error) {
-            console.log(error.message);
             res.status(500).json({
                 success: false,
                 message: `Failed to update User. Try again.`,
@@ -142,7 +141,7 @@ class UserController {
         // Fetch and return the user from database
         const userRepository = getRepository(User);
         try {
-            const user = await userRepository.findOneOrFail(id);
+            const user = await userRepository.findOneOrFail(id, { relations: ["profile"] });
             user.password = undefined;
             return res.status(200).json({
                 success: "true",
@@ -198,7 +197,6 @@ class UserController {
                 data: user,
             });
         } catch (error) {
-            console.log(error.message);
             res.status(500).json({
                 success: false,
                 message: `Failed to update User. Try again.`,

@@ -12,6 +12,7 @@ import {
 // Entities
 import { User } from "./User";
 import { Post } from "./Post";
+import { Huddle } from "./Huddle";
 
 @Entity({ name: "comments" })
 export class Comment {
@@ -41,4 +42,7 @@ export class Comment {
 
     @ManyToOne((type) => Post, (post) => post.comments)
     post: Post;
+
+    @ManyToOne((type) => Huddle, (huddle) => huddle.comments)
+    huddle: Huddle;
 }

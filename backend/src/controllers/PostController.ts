@@ -69,7 +69,7 @@ class PostController {
         post.tags = tags;
         post.user = req.user;
 
-        //Get the user from database
+        // Get the user from database
         const postRepository = getRepository(Post);
         try {
             const newPost = await postRepository.save(post);
@@ -79,7 +79,6 @@ class PostController {
                 data: newPost,
             });
         } catch (error) {
-            console.log(error);
             res.status(500).json({
                 success: false,
                 message: `Failed to create post. Try again.`,
@@ -88,7 +87,7 @@ class PostController {
     };
 
     static getPostByID = async (req: Request, res: Response) => {
-        //Get the ID from the url
+        // Get the ID from the url
         const id: string = req.params.id;
 
         if (!id) {
@@ -98,7 +97,7 @@ class PostController {
             });
         }
 
-        //Get the user from database
+        // Get the user from database
         const postRepository = getRepository(Post);
         try {
             const post = await postRepository.findOneOrFail(id);
@@ -116,7 +115,7 @@ class PostController {
     };
 
     static updatePostByID = async (req: UserRequest, res: Response) => {
-        //Get the ID from the url
+        // Get the ID from the url
         const id: string = req.params.id;
 
         if (!id) {
@@ -132,7 +131,6 @@ class PostController {
         try {
             post = await postRepository.findOneOrFail(id);
         } catch (error) {
-            console.log(error);
             res.status(404).json({
                 success: false,
                 message: `No Posts found with ID: ${id}`,
@@ -142,14 +140,12 @@ class PostController {
         // Update user with parameters from the request body
         try {
             let updatedPost = await postRepository.save({ id, ...post, ...req.body });
-            console.log(updatedPost);
             return res.status(200).json({
                 success: "true",
                 message: "Post was successfully updated!",
                 data: updatedPost,
             });
         } catch (error) {
-            console.log(error);
             res.status(500).json({
                 success: false,
                 message: `Failed to update Post. Try again.`,
@@ -158,7 +154,7 @@ class PostController {
     };
 
     static deletePostByID = async (req: UserRequest, res: Response) => {
-        //Get the ID from the url
+        // Get the ID from the url
         const id: string = req.params.id;
 
         if (!id) {
@@ -168,7 +164,7 @@ class PostController {
             });
         }
 
-        //Get the user from database
+        // Get the user from database
         const postRepository = getRepository(Post);
         try {
             await postRepository.delete(id);
@@ -177,7 +173,6 @@ class PostController {
                 message: "Post was successfully deleted!",
             });
         } catch (error) {
-            console.log(error);
             res.status(500).json({
                 success: false,
                 message: `Failed to create post. Try again.`,

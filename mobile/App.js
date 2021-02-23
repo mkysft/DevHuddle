@@ -1,11 +1,18 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { enableScreens } from "react-native-screens";
 import { Provider as PaperProvider } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
 
+// Contexts
+import { AuthContext } from "./contexts/AuthContext";
 import { PreferencesContext } from "./contexts/PreferencesContext";
+
+// Theming
 import { HuddleThemeLight, HuddleThemeDark } from "./theme";
-import Main from "./screens/Main";
+import Application from "./screens";
+
+import { setAuthorizationToken } from "./services/axios";
 
 export default function App() {
     // PERFORMANCE OPTIMIZATIONS
@@ -18,7 +25,7 @@ export default function App() {
         return setIsThemeDark(!isThemeDark);
     }, [isThemeDark]);
 
-    const USER_PREFERENCES = useMemo(
+    const PREFERENCES_CONTEXT = useMemo(
         () => ({
             toggleTheme,
             isThemeDark,
@@ -26,13 +33,65 @@ export default function App() {
         [toggleTheme, isThemeDark]
     );
 
+    // AUTHENTICATION
+    const [token, setToken] = useState("");
+    const [user, setUser] = useState({});
+    const [userProfile, setUserProfile] = useState({});
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    const setUserData = useCallback((userData) => {
+        setUser({ ...userData });
+    }, []);
+
+    const setTokenData = useCallback((tokenData) => {
+        setToken(tokenData);
+    }, []);
+
+    const setProfileData = useCallback((profileData) => {
+        return setUserProfile({ ...profileData });
+    }, []);
+
+    const grantAccess = useCallback(() => {
+        setIsAuthenticated(true);
+    }, []);
+
+    const logoutUser = useCallback(() => {
+        // Clear state and stuff
+        setIsAuthenticated(false);
+    }, []);
+
+    useEffect(() => {
+        if (token) {
+            setAuthorizationToken(token);
+        }
+        return () => {
+            console.log("Exit");
+        };
+    }, [token]);
+
+    const AUTH_CONTEXT = {
+        user,
+        setUserData,
+        token,
+        setTokenData,
+        userProfile,
+        setProfileData,
+        isAuthenticated,
+        grantAccess,
+        logoutUser,
+    };
+
     return (
-        <PreferencesContext.Provider value={USER_PREFERENCES}>
-            <PaperProvider theme={HuddleTheme}>
-                <NavigationContainer theme={HuddleTheme}>
-                    <Main />
-                </NavigationContainer>
-            </PaperProvider>
-        </PreferencesContext.Provider>
+        <AuthContext.Provider value={AUTH_CONTEXT}>
+            <PreferencesContext.Provider value={PREFERENCES_CONTEXT}>
+                <PaperProvider theme={HuddleTheme}>
+                    <SafeAreaProvider>
+                        <NavigationContainer theme={HuddleTheme}>
+                            <Application />
+                        </NavigationContainer>
+                    </SafeAreaProvider>
+                </PaperProvider>
+            </PreferencesContext.Provider>
+        </AuthContext.Provider>
     );
 }

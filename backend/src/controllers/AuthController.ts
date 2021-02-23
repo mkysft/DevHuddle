@@ -3,11 +3,23 @@ import { getRepository } from "typeorm";
 import { validate } from "class-validator";
 // Entities
 import { User } from "../entities/User";
+import { Profile } from "../entities/Profile";
 
 class AuthController {
     static RegisterUser = async (req: Request, res: Response) => {
         // Get parameters from the request body
         let { firstName, lastName, emailAddress, password } = req.body;
+        if (!(firstName && lastName && emailAddress && password)) {
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required for registration.",
+            });
+        }
+
+        // Create a profile for User
+        let profile = new Profile();
+        const profileRepository = getRepository(Profile);
+        let newProfile = await profileRepository.save(profile);
 
         // Create a new User
         let user = new User();
@@ -15,6 +27,7 @@ class AuthController {
         user.lastName = lastName;
         user.emailAddress = emailAddress;
         user.password = password;
+        user.profile = newProfile;
 
         // Validate if the parameters are ok
         const errors = await validate(user);
@@ -30,8 +43,10 @@ class AuthController {
 
         // Try to save. If fails, the email is already in use
         const userRepository = getRepository(User);
+        let newUser;
         try {
-            await userRepository.save(user);
+            newUser = await userRepository.save(user);
+            newUser.password = undefined;
         } catch (error) {
             return res.status(409).json({
                 success: false,
@@ -42,6 +57,7 @@ class AuthController {
         // If success, send response with token
         return res.status(200).json({
             success: true,
+            data: newUser,
             token: user.signJsonWebToken(),
             message: "Successfully Registered. Welcome to Dev Huddle!",
         });
@@ -63,6 +79,7 @@ class AuthController {
         try {
             user = await userRepository.findOneOrFail({
                 where: { emailAddress },
+                relations: ["profile"],
             });
         } catch (error) {
             return res.status(401).json({
@@ -79,9 +96,12 @@ class AuthController {
             });
         }
 
+        user.password = undefined;
+
         // Send the JWT in the response
         return res.status(200).json({
             success: true,
+            data: user,
             token: user.signJsonWebToken(),
             message: "Successfully Authenticated. Welcome back!",
         });

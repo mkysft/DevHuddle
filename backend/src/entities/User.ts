@@ -5,16 +5,20 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     Unique,
+    OneToOne,
     OneToMany,
     BeforeInsert,
     BeforeUpdate,
+    JoinColumn,
 } from "typeorm";
 import { validate, IsNotEmpty } from "class-validator";
 import * as bcrypt from "bcryptjs";
 import * as jwt from "jsonwebtoken";
 
 // Entities
+import { Profile } from "./Profile";
 import { Post } from "./Post";
+import { Huddle } from "./Huddle";
 import { Comment } from "./Comment";
 
 export enum UserRole {
@@ -66,7 +70,7 @@ export class User {
     })
     experienceLevel: string;
 
-    @Column({ type: "simple-array", default: "HTML,CSS" })
+    @Column({ type: "simple-array", default: "" })
     techStack: string[];
 
     @Column()
@@ -78,8 +82,15 @@ export class User {
     updatedAt: Date;
 
     // Relations
+    @OneToOne(() => Profile)
+    @JoinColumn()
+    profile: Profile;
+
     @OneToMany((type) => Post, (post) => post.user)
     posts: Post[];
+
+    @OneToMany((type) => Huddle, (huddle) => huddle.user)
+    huddles: Huddle[];
 
     @OneToMany((type) => Comment, (comment) => comment.user)
     comments: Comment[];

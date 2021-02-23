@@ -4,3 +4,5 @@ export const PreferencesContext = createContext({
     toggleTheme: () => {},
     isThemeDark: false,
 });
+
+export default PreferencesContext;

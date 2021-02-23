@@ -1,0 +1,27 @@
+export const ARTICLE_TAGS = [
+    "html",
+    "css",
+    "frontend",
+    "reactjs",
+    "vuejs",
+    "javascript",
+    "backend",
+    "nodejs",
+    "express",
+    "php",
+    "laravel",
+    "websocket",
+    "webrtc",
+    "mobile",
+    "flutter",
+    "react-native",
+    "android",
+    "ios",
+    "kotlin",
+    "swift",
+    "devops",
+    "freelancing",
+    "startup",
+];
+
+export default ARTICLE_TAGS;
