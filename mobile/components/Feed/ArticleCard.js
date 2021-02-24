@@ -7,16 +7,13 @@ import parseISO from "date-fns/parseISO";
 
 export default function ArticleCard({ article }) {
     const theme = useTheme();
-    // console.log(article);
     const { title, pubDate, thumbnail } = article;
-
-    // console.log("art???", article);
 
     return (
         <View>
             <Card style={styles.card}>
                 <Image source={{ uri: thumbnail }} resizeMode="cover" resizeMethod="resize" style={styles.image} />
-                <Card.Title title={title} titleStyle={styles.title} />
+                <Card.Title title={title} titleNumberOfLines={2} titleStyle={styles.title} />
                 <Card.Actions style={styles.actions}>
                     <Caption>{pubDate ? format(new Date(pubDate), "LLL dd y") : null}</Caption>
                     <View style={{ flexDirection: "row" }}>
@@ -49,9 +46,11 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 16,
+        lineHeight: 24,
         flexWrap: "wrap",
         margin: 0,
         marginLeft: 32,
+        marginRight: 8,
     },
     actions: {
         justifyContent: "space-between",

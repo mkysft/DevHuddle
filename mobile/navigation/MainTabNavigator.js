@@ -1,4 +1,6 @@
 import React from "react";
+import { StatusBar } from "react-native";
+import { useTheme } from "react-native-paper";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import Entypo from "react-native-vector-icons/Entypo";
 import Material from "react-native-vector-icons/MaterialCommunityIcons";
@@ -15,8 +17,15 @@ import SettingsScreen from "../screens/Main/Settings";
 const MainTab = createMaterialBottomTabNavigator();
 
 export default function MainTabNavigator() {
+    const theme = useTheme();
     return (
         <SafeScreen>
+            {/* <StatusBar
+                animated={true}
+                backgroundColor={theme.colors.primaryDark}
+                barStyle="default"
+                showHideTransition="slide"
+            /> */}
             <MainTab.Navigator initialRouteName="Feed">
                 <MainTab.Screen
                     name="Feed"

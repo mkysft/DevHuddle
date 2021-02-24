@@ -6,7 +6,7 @@ import { asyncGetTodaysFeed } from "../../../services/FeedServices";
 import ArticleCard from "../../../components/Feed/ArticleCard";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 
-export default function FeedScreen({ tag }) {
+export default function FeedScreen({ articleID }) {
     const [articles, setArticles] = useState([]);
     const [lastUpdated, setLastUpdated] = useState("");
     const [refreshing, setRefreshing] = useState(false);
@@ -16,15 +16,15 @@ export default function FeedScreen({ tag }) {
     }, [tag]);
 
     const getTagFeed = async () => {
-        setRefreshing(true);
-        const results = await asyncGetTodaysFeed({ tag });
-        if (results?.success) {
-            const { data } = results;
-            console.log("@@@ LENGTH", data.length);
-            setArticles(data);
-            setLastUpdated(new Date());
-            setRefreshing(false);
-        }
+        // setRefreshing(true);
+        // const results = await asyncGetTodaysFeed({ tag });
+        // if (results?.success) {
+        //     const { data } = results;
+        //     console.log("@@@ LENGTH", data.length);
+        //     setArticles(data);
+        //     setLastUpdated(new Date());
+        //     setRefreshing(false);
+        // }
     };
 
     const renderArticle = ({ item, index }) => {
@@ -33,25 +33,10 @@ export default function FeedScreen({ tag }) {
 
     return (
         <ScreenContainer>
-            <Caption style={styles.caption}>
+            <Caption>
                 Last Update: {lastUpdated ? formatDistanceToNow(lastUpdated, { addSuffix: true }) : null}{" "}
             </Caption>
-            <FlatList
-                data={articles}
-                extraData={articles}
-                renderItem={renderArticle}
-                onRefresh={getTagFeed}
-                refreshing={refreshing}
-                initialNumToRender={6}
-                removeClippedSubviews={true}
-                keyExtractor={(article) => article.guid}
-                style={styles.container}
-            />
-            {/* <ScrollView>
-                {articles.map((article) => (
-                    <ArticleCard key={article.guid} article={article} />
-                ))}
-            </ScrollView> */}
+            <ScrollView />
         </ScreenContainer>
     );
 }
@@ -59,8 +44,5 @@ export default function FeedScreen({ tag }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    caption: {
-        textAlign: "right",
     },
 });

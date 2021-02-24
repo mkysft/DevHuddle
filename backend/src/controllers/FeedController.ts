@@ -31,16 +31,19 @@ class UserController {
                 axios.spread((...responses) => {
                     responses.forEach((response, index) => {
                         let articles = xmlParser.parse(response.data).rss.channel.item;
-                        if (articles.length > 5) articleSets.slice(0, 4);
+                        if (articles?.length > 5) articleSets.slice(0, 4);
                         if (Array.isArray(articles)) {
                             let articlesWithImage = articles.map((article) => {
                                 let content = article["content:encoded"];
                                 if (content) {
                                     let urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g;
+                                    urlRegex = /src\s*=\s*"(.+?)"/;
                                     let urls = content.match(urlRegex);
                                     // TODO: Make sure is link to image
-                                    article.thumbnail = urls[0].replace(/['"]+/g, "");
+                                    let imgLink = urls[0].replace(/src\s*=\s*/, "");
+                                    article.thumbnail = imgLink.replace(/['"]+/g, "");
                                 }
+                                article["content:encoded"] = undefined;
                                 return article;
                             });
                             articleSets = [...articleSets, ...articlesWithImage];
