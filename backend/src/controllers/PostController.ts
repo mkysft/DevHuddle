@@ -58,14 +58,13 @@ class PostController {
 
     static createPost = async (req: UserRequest, res: Response) => {
         // Get parameters from the request body
-        let { title, slug, description, contentMarkdown, tags } = req.body;
+        let { title, description, content, tags } = req.body;
 
         // Create a new User
         let post = new Post();
         post.title = title;
-        post.slug = slug;
         post.description = description;
-        post.contentMarkdown = contentMarkdown;
+        post.content = content;
         post.tags = tags;
         post.user = req.user;
 

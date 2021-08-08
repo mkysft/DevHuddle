@@ -4,27 +4,25 @@ import {
     Column,
     CreateDateColumn,
     UpdateDateColumn,
-    BeforeInsert,
-    BeforeUpdate,
-    ManyToOne,
-    OneToMany,
 } from "typeorm";
 
 // Entities
+
+export enum ProfileType {
+    DEVELOPER = "developer",
+    BUSINESS = "business",
+}
 
 @Entity({ name: "profiles" })
 export class Profile {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column({ type: "simple-array", default: "frontend,backend,devops" })
-    tags: string[];
+    @Column({ default: 0 })
+    interactions: number;
 
     @Column({ default: 0 })
-    avgReadingTime: number;
-
-    @Column({ default: 0 })
-    avgUsageTime: number;
+    impressions: number;
 
     @Column()
     @CreateDateColumn()

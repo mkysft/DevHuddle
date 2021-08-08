@@ -4,16 +4,12 @@ import {
     Column,
     CreateDateColumn,
     UpdateDateColumn,
-    BeforeInsert,
-    BeforeUpdate,
     ManyToOne,
-    OneToMany,
 } from "typeorm";
 import { IsNotEmpty } from "class-validator";
 
 // Entities
 import { User } from "./User";
-import { Comment } from "./Comment";
 
 @Entity({ name: "huddles" })
 export class Huddle {
@@ -29,9 +25,9 @@ export class Huddle {
 
     @Column()
     @IsNotEmpty()
-    contentSerialized: string;
+    readme: string;
 
-    @Column({ type: "simple-array", default: "HTML,CSS" })
+    @Column({ type: "simple-array", default: "" })
     tags: string[];
 
     @Column()
@@ -45,7 +41,4 @@ export class Huddle {
     // Relations
     @ManyToOne((type) => User, (user) => user.huddles, { eager: true })
     user: User;
-
-    @OneToMany((type) => Comment, (comment) => comment.huddle)
-    comments: Comment[];
 }

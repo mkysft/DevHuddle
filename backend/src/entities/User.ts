@@ -23,7 +23,7 @@ import { Comment } from "./Comment";
 
 export enum UserRole {
     ADMIN = "admin",
-    EDITOR = "editor",
+    DEVELOPER = "developer",
     GHOST = "ghost",
 }
 
@@ -31,7 +31,7 @@ export enum ExperienceLevel {
     JUNIOR = "junior",
     INTERMEDIATE = "intermediate",
     SENIOR = "senior",
-    PRINCIPAL = "principal",
+    LEAD = "lead",
 }
 
 @Entity({ name: "users" })
@@ -56,22 +56,29 @@ export class User {
     @IsNotEmpty()
     password: string;
 
+    @Column({ default: "" })
+    @IsNotEmpty()
+    mobile: string;
+
     @Column({
         type: "enum",
         enum: UserRole,
-        default: UserRole.EDITOR,
+        default: UserRole.DEVELOPER,
     })
     role: string;
 
     @Column({
         type: "enum",
         enum: ExperienceLevel,
-        default: ExperienceLevel.JUNIOR,
+        default: ExperienceLevel.INTERMEDIATE,
     })
     experienceLevel: string;
 
     @Column({ type: "simple-array", default: "" })
-    techStack: string[];
+    technologies: string[];
+
+    @Column({ type: "simple-array", default: "" })
+    interests: string[];
 
     @Column()
     @CreateDateColumn()
@@ -98,6 +105,7 @@ export class User {
     // Methods
     @BeforeInsert()
     @BeforeUpdate()
+    // Validate user before operations
     async validateUser() {
         const errors = await validate(this);
         if (errors.length > 0) {
@@ -105,6 +113,7 @@ export class User {
         }
     }
 
+    // Create token from user data
     signJsonWebToken() {
         return jwt.sign(
             {
@@ -122,10 +131,12 @@ export class User {
         );
     }
 
+    // Encrypt string into hash password
     hashEncryptPassword() {
         this.password = bcrypt.hashSync(this.password, 8);
     }
 
+    // Check if string password matches encrypted hash value
     checkIfPasswordMatches(rawPassword: string) {
         return bcrypt.compareSync(rawPassword, this.password);
     }

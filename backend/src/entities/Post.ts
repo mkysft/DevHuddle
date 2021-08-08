@@ -4,15 +4,10 @@ import {
     Column,
     CreateDateColumn,
     UpdateDateColumn,
-    BeforeInsert,
-    BeforeUpdate,
     ManyToOne,
     OneToMany,
 } from "typeorm";
 import { IsNotEmpty } from "class-validator";
-import marked from "marked";
-import xss from "xss";
-import slugify from "slugify";
 
 // Entities
 import { User } from "./User";
@@ -28,18 +23,12 @@ export class Post {
     title: string;
 
     @Column()
-    slug: string;
-
-    @Column()
     @IsNotEmpty()
     description: string;
 
     @Column()
     @IsNotEmpty()
-    contentMarkdown: string;
-
-    @Column()
-    contentHTML: string;
+    content: string;
 
     @Column({ type: "simple-array", default: "HTML,CSS" })
     tags: string[];
@@ -58,18 +47,4 @@ export class Post {
 
     @OneToMany((type) => Comment, (comment) => comment.post)
     comments: Comment[];
-
-    // Methods
-    @BeforeInsert()
-    @BeforeUpdate()
-    async processHTML() {
-        const dirtyHTML = await marked(this.contentMarkdown);
-        this.contentHTML = xss(dirtyHTML);
-    }
-
-    @BeforeInsert()
-    @BeforeUpdate()
-    async slugifyTitle() {
-        this.slug = slugify(this.title, { lower: true, strict: true });
-    }
 }

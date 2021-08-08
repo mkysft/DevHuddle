@@ -12,7 +12,6 @@ import {
 // Entities
 import { User } from "./User";
 import { Post } from "./Post";
-import { Huddle } from "./Huddle";
 
 @Entity({ name: "comments" })
 export class Comment {
@@ -22,11 +21,11 @@ export class Comment {
     @Column()
     body: string;
 
-    @Column({ default: 0 })
-    likes: string;
+    @Column({ type: "simple-array", default: "" })
+    likes: string[];
 
-    @Column({ default: 0 })
-    dislikes: string;
+    @Column({ type: "simple-array", default: "" })
+    dislikes: string[];
 
     @Column()
     @CreateDateColumn()
@@ -42,7 +41,4 @@ export class Comment {
 
     @ManyToOne((type) => Post, (post) => post.comments)
     post: Post;
-
-    @ManyToOne((type) => Huddle, (huddle) => huddle.comments)
-    huddle: Huddle;
 }
