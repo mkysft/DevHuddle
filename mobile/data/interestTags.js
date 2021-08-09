@@ -1,4 +1,4 @@
-export const ARTICLE_TAGS = [
+export const INTEREST_TAGS = [
     "html",
     "css",
     "frontend",
@@ -24,4 +24,4 @@ export const ARTICLE_TAGS = [
     "startup",
 ];
 
-export default ARTICLE_TAGS;
+export default INTEREST_TAGS;

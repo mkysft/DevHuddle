@@ -2,11 +2,12 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "react-native";
 import { enableScreens } from "react-native-screens";
-import { Provider as PaperProvider } from "react-native-paper";
+import { Provider as PaperProvider, Snackbar } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
 
 // Contexts
 import { AuthContext } from "./contexts/AuthContext";
+import { GlobalContext } from "./contexts/GlobalContext";
 import { PreferencesContext } from "./contexts/PreferencesContext";
 
 // Theming
@@ -26,12 +27,28 @@ export default function App() {
         return setIsThemeDark(!isThemeDark);
     }, [isThemeDark]);
 
+    // PREFERENCES
     const PREFERENCES_CONTEXT = useMemo(
         () => ({
             toggleTheme,
             isThemeDark,
         }),
         [toggleTheme, isThemeDark]
+    );
+
+    // GLOBAL
+    const [snackbarMessage, setSnackbarMessage] = useState(false);
+    const [snackbarAction, setSnackbarAction] = useState({ label: "Dismiss", onPress: () => {} });
+    const [isSnackbarVisible, setIsSnackbarVisible] = useState(false);
+    const onDismissSnackBar = () => setIsSnackbarVisible(false);
+
+    const GLOBAL_CONTEXT = useMemo(
+        () => ({
+            setSnackbarMessage,
+            setSnackbarAction,
+            setIsSnackbarVisible,
+        }),
+        [setSnackbarMessage, setSnackbarAction, setIsSnackbarVisible]
     );
 
     // AUTHENTICATION
@@ -85,13 +102,23 @@ export default function App() {
     return (
         <AuthContext.Provider value={AUTH_CONTEXT}>
             <PreferencesContext.Provider value={PREFERENCES_CONTEXT}>
-                <PaperProvider theme={HuddleTheme}>
-                    <SafeAreaProvider>
-                        <NavigationContainer theme={HuddleTheme}>
-                            <Application />
-                        </NavigationContainer>
-                    </SafeAreaProvider>
-                </PaperProvider>
+                <GlobalContext.Provider value={GLOBAL_CONTEXT}>
+                    <PaperProvider theme={HuddleTheme}>
+                        <SafeAreaProvider>
+                            <NavigationContainer theme={HuddleTheme}>
+                                <Application />
+                                {/* Global Notification */}
+                            </NavigationContainer>
+                            <Snackbar
+                                visible={isSnackbarVisible}
+                                onDismiss={onDismissSnackBar}
+                                action={{ ...snackbarAction }}
+                            >
+                                {snackbarMessage}
+                            </Snackbar>
+                        </SafeAreaProvider>
+                    </PaperProvider>
+                </GlobalContext.Provider>
             </PreferencesContext.Provider>
         </AuthContext.Provider>
     );

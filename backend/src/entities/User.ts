@@ -27,25 +27,16 @@ export enum UserRole {
     GHOST = "ghost",
 }
 
-export enum ExperienceLevel {
-    JUNIOR = "junior",
-    INTERMEDIATE = "intermediate",
-    SENIOR = "senior",
-    LEAD = "lead",
-}
-
 @Entity({ name: "users" })
 @Unique(["emailAddress"])
 export class User {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column()
-    @IsNotEmpty()
+    @Column({ default: "" })
     firstName: string;
 
-    @Column()
-    @IsNotEmpty()
+    @Column({ default: "" })
     lastName: string;
 
     @Column()
@@ -57,7 +48,6 @@ export class User {
     password: string;
 
     @Column({ default: "" })
-    @IsNotEmpty()
     mobile: string;
 
     @Column({
@@ -66,19 +56,6 @@ export class User {
         default: UserRole.DEVELOPER,
     })
     role: string;
-
-    @Column({
-        type: "enum",
-        enum: ExperienceLevel,
-        default: ExperienceLevel.INTERMEDIATE,
-    })
-    experienceLevel: string;
-
-    @Column({ type: "simple-array", default: "" })
-    technologies: string[];
-
-    @Column({ type: "simple-array", default: "" })
-    interests: string[];
 
     @Column()
     @CreateDateColumn()

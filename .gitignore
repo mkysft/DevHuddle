@@ -3,7 +3,7 @@ backend/dist
 
 frontend/node_modules
 
-mobile/node_modules/**/*
+mobile/node_modules
 mobile/.expo/*
 mobile/npm-debug.*
 mobile/*.jks
@@ -12,7 +12,7 @@ mobile/*.p12
 mobile/*.key
 mobile/*.mobileprovision
 mobile/*.orig.*
-mobile/web-build/
+mobile/web-build
 
 # macOS
 mobile/.DS_Store

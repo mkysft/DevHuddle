@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, FlatList, ScrollView, Text } from "react-native";
 import { Caption } from "react-native-paper";
 import ScreenContainer from "../../../components/ScreenContainer";
-import { asyncGetTodaysFeed } from "../../../services/FeedServices";
+import { asyncGetFeed } from "../../../services/FeedServices";
 import ArticleCard from "../../../components/Feed/ArticleCard";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 
@@ -12,12 +12,12 @@ export default function FeedScreen({ tag }) {
     const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
-        getTagFeed();
-    }, [tag]);
+        getPostFeed();
+    }, []);
 
-    const getTagFeed = async () => {
+    const getPostFeed = async () => {
         setRefreshing(true);
-        const results = await asyncGetTodaysFeed({ tag });
+        const results = await asyncGetFeed({ tag });
         if (results?.success) {
             const { data } = results;
             console.log("@@@ LENGTH", data.length);
@@ -34,9 +34,10 @@ export default function FeedScreen({ tag }) {
     return (
         <ScreenContainer>
             <Caption style={styles.caption}>
-                Last Update: {lastUpdated ? formatDistanceToNow(lastUpdated, { addSuffix: true }) : null}{" "}
+                Placeholder
+                {/* Last Update: {lastUpdated ? formatDistanceToNow(lastUpdated, { addSuffix: true }) : null}{" "} */}
             </Caption>
-            <FlatList
+            {/* <FlatList
                 data={articles}
                 extraData={articles}
                 renderItem={renderArticle}
@@ -46,7 +47,7 @@ export default function FeedScreen({ tag }) {
                 removeClippedSubviews={true}
                 keyExtractor={(article) => article.guid}
                 style={styles.container}
-            />
+            /> */}
             {/* <ScrollView>
                 {articles.map((article) => (
                     <ArticleCard key={article.guid} article={article} />

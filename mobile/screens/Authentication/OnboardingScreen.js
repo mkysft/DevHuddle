@@ -7,21 +7,21 @@ import { AuthContext } from "../../contexts/AuthContext";
 
 import { asyncUpdateProfile } from "../../services/ProfileServices";
 
-import { ARTICLE_TAGS } from "../../data/articleTags";
+import { INTEREST_TAGS } from "../../data/interestTags";
 
 export default function OnboardingScreen({ navigation }) {
     const theme = useTheme();
     const { user, userProfile, setProfileData, grantAccess } = useContext(AuthContext);
-
+    console.log(userProfile);
     // State
-    const [userTags, setUserTags] = useState([...userProfile.tags]);
-
+    const [interestTags, setInterestTags] = useState([...(userProfile?.interests || [])]);
     const [loading, setIsLoading] = useState(false);
 
+    // Update user profile
     const updateUserProfile = async () => {
         setIsLoading((prev) => true);
-        const { id } = user.profile;
-        const results = await asyncUpdateProfile(id, { tags: userTags });
+        const { id } = user?.profile;
+        const results = await asyncUpdateProfile(id, { interests: [...interestTags] });
         if (results?.success) {
             const { data, token } = results;
             console.log(data);
@@ -34,18 +34,18 @@ export default function OnboardingScreen({ navigation }) {
     };
 
     const toggleTag = (tag) => {
-        if (userTags.includes(tag)) {
-            const newTags = userTags.filter((uTag) => uTag !== tag);
-            setUserTags([...newTags]);
+        if (interestTags.includes(tag)) {
+            const newTags = interestTags.filter((iTag) => iTag !== tag);
+            setInterestTags([...newTags]);
         } else {
-            const newTags = [...userTags];
+            const newTags = [...interestTags];
             newTags.push(tag);
-            setUserTags([...newTags]);
+            setInterestTags([...newTags]);
         }
     };
 
     const isTagSelected = (tag) => {
-        return userTags.includes(tag);
+        return interestTags.includes(tag);
     };
 
     return (
@@ -56,7 +56,7 @@ export default function OnboardingScreen({ navigation }) {
                     {`What peaks your interest? \n Pick 5 or more topics to get started.`}
                 </Text>
                 <View style={styles.techContainer}>
-                    {ARTICLE_TAGS.map((tag) => {
+                    {INTEREST_TAGS.map((tag) => {
                         const selected = isTagSelected(tag);
                         return (
                             <Chip
@@ -76,7 +76,7 @@ export default function OnboardingScreen({ navigation }) {
                     mode="contained"
                     uppercase={false}
                     loading={loading}
-                    disabled={userTags.length < 5}
+                    disabled={interestTags.length < 5}
                     onPress={updateUserProfile}
                     labelStyle={styles.linkButton}
                 >
@@ -84,7 +84,7 @@ export default function OnboardingScreen({ navigation }) {
                 </Button>
                 <Button
                     uppercase={false}
-                    disabled={userTags.length >= 5}
+                    disabled={interestTags.length >= 5}
                     onPress={() => grantAccess()}
                     labelStyle={styles.linkButton}
                 >

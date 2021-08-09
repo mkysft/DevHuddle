@@ -8,7 +8,7 @@ const routes = require("./routes");
 const app = express();
 
 // Configure Application
-const port = process.env.PORT || "4200";
+const port = process.env.PORT || "4000";
 app.set("port", port);
 
 // Middleware

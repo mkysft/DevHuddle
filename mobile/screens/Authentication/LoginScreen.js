@@ -1,20 +1,21 @@
 import React, { useState, useContext } from "react";
 import ScreenContainer from "../../components/ScreenContainer";
 import { StyleSheet, View, Text } from "react-native";
-import { TextInput, Button } from "react-native-paper";
+import { TextInput, Button, Snackbar } from "react-native-paper";
 
 import { AuthContext } from "../../contexts/AuthContext";
+import { GlobalContext } from "../../contexts/GlobalContext";
 
 import { asyncLoginUser } from "../../services/AuthServices";
 
 export default function LoginScreen({ navigation }) {
     // Context
-
     const { setUserData, setTokenData, setProfileData, grantAccess } = useContext(AuthContext);
+    const { setSnackbarMessage, setSnackbarAction, setIsSnackbarVisible } = useContext(GlobalContext);
     // State
 
-    const [emailAddress, setEmailAddress] = useState("michael.cowan@smsja.net");
-    const [password, setPassword] = useState("password");
+    const [emailAddress, setEmailAddress] = useState("evertonmichael.dev@gmail.com");
+    const [password, setPassword] = useState("mikado24");
 
     // UX State
     const [loading, setIsLoading] = useState(false);
@@ -24,6 +25,7 @@ export default function LoginScreen({ navigation }) {
     const authenticateUser = async () => {
         setIsLoading((prev) => true);
         const results = await asyncLoginUser({ emailAddress, password });
+
         if (results?.success) {
             const { data, token } = results;
             setUserData(data);
@@ -33,6 +35,11 @@ export default function LoginScreen({ navigation }) {
                 grantAccess();
             }, 250);
             // TODO: Error handling + Toast
+        } else {
+            setIsLoading((prev) => false);
+            setSnackbarMessage("Failed to Authenticate!");
+            setSnackbarAction({ label: "Retry", onPress: authenticateUser });
+            setIsSnackbarVisible(true);
         }
     };
 
@@ -45,7 +52,7 @@ export default function LoginScreen({ navigation }) {
     return (
         <ScreenContainer>
             <View style={styles.container}>
-                <Text style={styles.header}>Welcome Back</Text>
+                <Text style={styles.header}>Welcome 127.0.0.1</Text>
                 <Text style={styles.subheader}>Log in to access your feed</Text>
                 <View style={styles.form}>
                     <TextInput
@@ -110,5 +117,13 @@ const styles = StyleSheet.create({
     },
     linkButton: {
         letterSpacing: 0.4,
+    },
+    snackbarWrapper: {
+        // position: "absolute",
+        marginLeft: "auto",
+        marginRight: "auto",
+    },
+    snackbar: {
+        // backgroundColor: "red",
     },
 });

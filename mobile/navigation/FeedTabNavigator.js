@@ -14,6 +14,8 @@ const FeedTab = createMaterialTopTabNavigator();
 export default function FeedTabNavigator() {
     const { userProfile } = useContext(AuthContext);
 
+    const FEED_TYPES = ["Feed", "Popular"];
+
     return (
         <FeedTab.Navigator
             tabBarOptions={{
@@ -22,17 +24,18 @@ export default function FeedTabNavigator() {
                 style: {},
             }}
         >
-            {userProfile.tags.map((tag) => (
+            {FEED_TYPES.map((tag) => (
                 <FeedTab.Screen key={tag} name={tag}>
                     {(props) => <FeedScreen {...props} tag={tag} />}
                 </FeedTab.Screen>
             ))}
+            {/* <FeedTab.Screen name={"dailyFeed"} component={FeedScreen} /> */}
         </FeedTab.Navigator>
     );
 }
 
 const styles = StyleSheet.create({
     tab: {
-        textTransform: "uppercase",
+        fontWeight: "bold",
     },
 });

@@ -8,11 +8,12 @@ import { Profile } from "../entities/Profile";
 class AuthController {
     static RegisterUser = async (req: Request, res: Response) => {
         // Get parameters from the request body
-        let { firstName, lastName, emailAddress, password } = req.body;
-        if (!(firstName && lastName && emailAddress && password)) {
+        let { emailAddress, password } = req.body;
+
+        if (!(emailAddress && password)) {
             return res.status(400).json({
                 success: false,
-                message: "All fields are required for registration.",
+                message: "Both email and password are required for registration.",
             });
         }
 
@@ -21,12 +22,11 @@ class AuthController {
             // Create a profile for User
             let profile = new Profile();
             // const profileRepository = getRepository(Profile);
+            // let newProfile = await profileRepository.save(profile);
             let newProfile = await transactionalEntityManager.save(profile);
 
             // Create a new User
             let user = new User();
-            user.firstName = firstName;
-            user.lastName = lastName;
             user.emailAddress = emailAddress;
             user.password = password;
             user.profile = newProfile;
@@ -44,12 +44,14 @@ class AuthController {
             user.hashEncryptPassword();
 
             // Try to save. If fails, the email is already in use
-            // const userRepository = getRepository(User);
             let newUser;
             try {
+                // const userRepository = getRepository(User);
+                // newUser = await userRepository.save(user);
                 newUser = await transactionalEntityManager.save(user);
                 newUser.password = undefined;
             } catch (error) {
+                console.log(error)
                 return res.status(409).json({
                     success: false,
                     message: "An account is already associated with this email address.",

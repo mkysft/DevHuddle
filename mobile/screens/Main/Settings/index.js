@@ -67,16 +67,14 @@ export default function SettingsScreen() {
                 />
             </List.Section>
             <Divider />
-            <Text style={styles.info}>{"Developed by \n Michael ''Mikey'' Software"}</Text>
+            <Text style={styles.info}>{"Developed by \n @mikeysoftware"}</Text>
 
-            {/* Dialog */}
+            {/* Logout Dialog */}
             <Portal>
                 <Dialog visible={isDialogOpen} onDismiss={toggleDialog}>
                     <Dialog.Title>Logging Out</Dialog.Title>
                     <Dialog.Content>
-                        <Paragraph>
-                            Notifications for messages and huddles will be disabled until you re-login.
-                        </Paragraph>
+                        <Paragraph>Notifications will be disabled until you re-login.</Paragraph>
                     </Dialog.Content>
                     <Dialog.Actions>
                         <Button onPress={toggleDialog}>Cancel</Button>

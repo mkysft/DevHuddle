@@ -4,6 +4,6 @@ export const handleResponse = async (response) => {
 };
 
 export const handleError = (responseError) => {
-    console.error(responseError);
+    // console.error(responseError);
     // throw responseError;
 };

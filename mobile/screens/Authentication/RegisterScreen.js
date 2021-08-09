@@ -12,10 +12,8 @@ export default function RegisterScreen({ navigation }) {
     const { setUserData, setTokenData, setProfileData } = useContext(AuthContext);
 
     // State
-    const [firstName, setFirstname] = useState("");
-    const [lastName, setLastname] = useState("");
-    const [emailAddress, setEmailAddress] = useState("");
-    const [password, setPassword] = useState("");
+    const [emailAddress, setEmailAddress] = useState("evertonmichael.dev@gmail.com");
+    const [password, setPassword] = useState("mikado24");
 
     //  UX State
     const [loading, setIsLoading] = useState(false);
@@ -23,9 +21,9 @@ export default function RegisterScreen({ navigation }) {
     // Functions
     const registerUser = async () => {
         setIsLoading((prev) => true);
-        console.log({ firstName, lastName, emailAddress, password });
-        const results = await asyncRegisterUser({ firstName, lastName, emailAddress, password });
-        if (results.success) {
+        const results = await asyncRegisterUser({ emailAddress, password });
+
+        if (results?.success) {
             const { data, token } = results;
             setUserData(data);
             setTokenData(token);
@@ -53,20 +51,6 @@ export default function RegisterScreen({ navigation }) {
                 <View style={styles.form}>
                     <TextInput
                         dense
-                        label="Firstname"
-                        value={firstName}
-                        onChangeText={setFirstname}
-                        style={styles.field}
-                    />
-                    <TextInput
-                        dense
-                        label="Lastname"
-                        value={lastName}
-                        onChangeText={setLastname}
-                        style={styles.field}
-                    />
-                    <TextInput
-                        dense
                         label="Email"
                         value={emailAddress}
                         onChangeText={setEmailAddress}
@@ -89,14 +73,9 @@ export default function RegisterScreen({ navigation }) {
                     <Button uppercase={false} onPress={gotoLogin} labelStyle={styles.linkButton}>
                         Sign In
                     </Button>
-
-                    <Button
-                        uppercase={false}
-                        onPress={() => navigation.navigate("Onboarding")}
-                        labelStyle={styles.linkButton}
-                    >
-                        ONB
-                    </Button>
+                    {/* <Button uppercase={false} onPress={gotoOnboarding} labelStyle={styles.linkButton}>
+                        Skip to Onboarding
+                    </Button> */}
                 </View>
             </View>
         </ScreenContainer>
